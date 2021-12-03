@@ -1,27 +1,32 @@
 <template>
   <div id="app">
-    <Main/>
+    <Main />
+    <Footer />
   </div>
 </template>
 
 <script>
 import Main from './components/Main.vue'
+import Footer from './components/Footer.vue'
 
 export default {
   name: 'App',
   components: {
-    Main
+    Main,
+    Footer
   }
 }
 </script>
 
-<style>
+<style lang="scss">
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 </style>
