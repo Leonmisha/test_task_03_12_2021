@@ -1,11 +1,11 @@
 <template>
-  <b-card role="listitem">
-    <b-row>
-        <div class="name">Package: {{ item.name }}</div>
+  <b-card role="listitem" @click="$emit('click', arguments[0], item)">
+    <b-row v-if="!expanded">
+        <div class="name">Package: <a target="_blank" @click.stop :href="`https://www.npmjs.com/package/${item.name}`" >{{ item.name }}</a></div>
     </b-row>
     <b-row>
-        <b-col class="author-image"><a target="_blank" @click.stop :href="item.owner.link" ><img class="author-image__item" :src="item.owner.avatar"></a></b-col>
-        <b-col class="author-name"><a target="_blank" @click.stop :href="item.owner.link" >{{ item.owner.name }}</a></b-col>
+        <b-col class="author-image"><a target="_blank" @click.stop :href="item.owner.link"><img class="author-image__item" :src="item.owner.avatar"></a></b-col>
+        <b-col class="author-name"><a target="_blank" @click.stop :href="item.owner.link">{{ item.owner.name }}</a></b-col>
         <b-col class="version_license">
             <div class="version">
                 <svg height="16" viewBox="0 0 16 16" version="1.1" width="16" class="version-icon">
@@ -20,18 +20,68 @@
         <b-col>{{ item.description }}</b-col>
     </b-row>
     <div class="tags">
-        <div v-for="tag in item.keywords" :key="tag" class="tags__item">
+        <div v-for="(tag, index) in item.keywords" :key="index" class="tags__item">
             {{ tag }}
         </div>
     </div>
+    <template v-if="expanded">
+      <template v-if="item.files">
+        <b-card class="file-tree">
+          <div class="file-tree__header">File system:</div>
+          <ul class="file-tree__files">
+            <template v-for="(file, index) in item.files">
+              <FileTreeItem @open="handleOpenFile" :item="file" :key="index"/>
+            </template>
+          </ul>
+        </b-card>
+      </template>
+      <template v-else-if="status === STATUSES.PENDING">
+        <b-spinner variant="primary" />
+      </template>
+      <template v-else-if="status === STATUSES.ERROR">
+        <b-alert show variant="danger" dismissible>
+          Network error. Can't get files of the package.
+        </b-alert>
+      </template>
+      <template v-else-if="status === STATUSES.DONE">
+        Can't get files of the package.
+      </template>
+    </template>
   </b-card>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
+import { STATUSES } from '@/store/constants'
+import FileTreeItem from '@/components/common/FileTreeItem.vue'
 
 export default {
   name: 'Card',
-  props: ['item']
+  components: { FileTreeItem },
+  props: {
+    item: {
+      type: Object,
+      required: true
+    },
+    expanded: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data () {
+    return {
+      STATUSES
+    }
+  },
+  methods: {
+    handleOpenFile ({ path }) {
+      window.open(`https://cdn.jsdelivr.net/npm/${this.item.name}@${this.item.version}/${path}`)
+    }
+  },
+  computed: {
+    ...mapGetters('modal', ['status'])
+  }
 }
 </script>
 
@@ -89,5 +139,18 @@ export default {
     }
     .tags__item:not(:last-child) {
         margin-right: 5px;
+    }
+    .file-tree {
+      &:hover {
+        background: inherit;
+      }
+    }
+    .file-tree__header {
+      color: orange;
+      margin-bottom: 5px;
+    }
+    .file-tree__files {
+      padding-left: 5px;
+      list-style-type: none;
     }
 </style>

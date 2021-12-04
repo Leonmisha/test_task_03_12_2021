@@ -1,9 +1,9 @@
 <template>
   <main class="search-table">
-    <template v-if="queryString && status === STATUSES.DONE && items.length > 0">
+    <template v-if="queryString && status === STATUSES.DONE && results.length > 0">
       <div class="list" role="list">
-        <template v-for="item in items">
-          <Card :item="item" :key="item.name"/>
+        <template v-for="item in results">
+          <Card :item="item" :key="item.objectID" @click="openPackage"/>
         </template>
       </div>
       <b-pagination
@@ -18,6 +18,14 @@
       <div v-else-if="status === STATUSES.DONE">No results founds</div>
       <b-spinner v-else-if="status === STATUSES.PENDING" variant="primary" />
     </template>
+    <b-modal :visible="modalVisible" @change="closeModal" id="modal-package" :title="openedPackage && openedPackage.name" hide-footer>
+      <template #modal-title>
+        <a target="_blank" :href="openedPackage ? `https://www.npmjs.com/package/${openedPackage.name}` : '#'" >
+          {{openedPackage && openedPackage.name}}
+        </a>
+      </template>
+      <Card :item="openedPackage" expanded />
+    </b-modal>
   </main>
 </template>
 
@@ -37,17 +45,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      items: 'results',
-      queryString: 'queryString',
-      status: 'status',
-      currentPage: 'currentPage',
-      pages: 'pages'
-    })
+    ...mapGetters('search', ['results', 'queryString', 'status', 'currentPage', 'pages']),
+    ...mapGetters('modal', ['openedPackage', 'modalVisible'])
   },
   methods: {
     changeCurrentPage (page) {
-      this.$store.dispatch('changePage', page)
+      this.$store.dispatch('search/changePage', page)
+    },
+    openPackage (e, packageObj) {
+      this.$store.dispatch('modal/openPackage', packageObj)
+    },
+    closeModal () {
+      this.$store.dispatch('modal/setModalVisible', false)
     }
   }
 }

@@ -11,15 +11,15 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'Search',
   computed: {
-    ...mapGetters(['queryString'])
+    ...mapGetters('search', ['queryString'])
   },
   methods: {
     updateQueryString (queryString) {
-      this.$store.dispatch('setQueryString', queryString)
+      this.$store.dispatch('search/setQueryString', queryString)
       this.getListSearch()
     },
     getListSearch: _.debounce(function () {
-      this.$store.dispatch('getListSearch')
+      this.$store.dispatch('search/getListSearch')
     }, 500)
   }
 }
