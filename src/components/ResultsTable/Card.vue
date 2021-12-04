@@ -4,8 +4,8 @@
         <div class="name">Package: {{ item.name }}</div>
     </b-row>
     <b-row>
-        <b-col class="author-image"><img class="author-image__item" :src="item.author.imageURL"></b-col>
-        <b-col class="author-name">{{ item.author.name }}</b-col>
+        <b-col class="author-image"><a target="_blank" @click.stop :href="item.owner.link" ><img class="author-image__item" :src="item.owner.avatar"></a></b-col>
+        <b-col class="author-name"><a target="_blank" @click.stop :href="item.owner.link" >{{ item.owner.name }}</a></b-col>
         <b-col class="version_license">
             <div class="version">
                 <svg height="16" viewBox="0 0 16 16" version="1.1" width="16" class="version-icon">
@@ -20,7 +20,7 @@
         <b-col>{{ item.description }}</b-col>
     </b-row>
     <div class="tags">
-        <div v-for="tag in item.tags" :key="tag" class="tags__item">
+        <div v-for="tag in item.keywords" :key="tag" class="tags__item">
             {{ tag }}
         </div>
     </div>
@@ -55,6 +55,10 @@ export default {
     .author-image__item {
         width: 20px;
         height: 20px;
+        transition: transform 1s;
+        &:hover {
+            transform: scale(1.2);
+        }
     }
     .version_license {
         display: flex;

@@ -1,13 +1,27 @@
 <template>
   <div class="search">
-    <b-input placeholder="Search for package"/>
+    <b-input :value="queryString" @input="updateQueryString" placeholder="Search for package"/>
   </div>
 </template>
 
 <script>
+import _ from 'lodash'
+import { mapGetters } from 'vuex'
 
 export default {
-  name: 'Search'
+  name: 'Search',
+  computed: {
+    ...mapGetters(['queryString'])
+  },
+  methods: {
+    updateQueryString (queryString) {
+      this.$store.dispatch('setQueryString', queryString)
+      this.getListSearch()
+    },
+    getListSearch: _.debounce(function () {
+      this.$store.dispatch('getListSearch')
+    }, 500)
+  }
 }
 </script>
 

@@ -1,19 +1,31 @@
 <template>
   <main class="search-table">
-    <div class="list" role="list">
-      <template v-for="item in items">
-        <Card :item="item" :key="item.name"/>
-      </template>
-    </div>
-    <b-pagination
-      v-model="currentPage"
-      :total-rows="rows"
-      :per-page="perPage"
-    />
+    <template v-if="queryString && status === STATUSES.DONE && items.length > 0">
+      <div class="list" role="list">
+        <template v-for="item in items">
+          <Card :item="item" :key="item.name"/>
+        </template>
+      </div>
+      <b-pagination
+        :value="currentPage"
+        @input="changeCurrentPage"
+        :total-rows="pages"
+        per-page="1"
+      />
+    </template>
+    <template v-else-if="queryString">
+      <div v-if="status === STATUSES.ERROR">Search error</div>
+      <div v-else-if="status === STATUSES.DONE">No results founds</div>
+      <b-spinner v-else-if="status === STATUSES.PENDING" variant="primary" />
+    </template>
   </main>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
+import { STATUSES } from '@/store/constants'
+
 import Card from './Card'
 
 export default {
@@ -21,112 +33,21 @@ export default {
   components: { Card },
   data () {
     return {
-      rows: 5,
-      perPage: 1,
-      currentPage: 1,
-      items: [
-        {
-          name: 'sjs',
-          author: {
-            name: 'elmerbulthuis',
-            imageURL: 'https://gravatar.com/avatar/54f9beb082c0771af47339bcc59e9d75?s=20'
-          },
-          version: '0.0.3',
-          license: null,
-          description: 'Asynchronous JavaScript for synchronous people',
-          tags: ['reactive', 'javascript', 'hey', 'javascript', 'hey', 'javascript', 'hey', 'javascript', 'hey', 'javascript', 'hey', 'javascript', 'hey', 'javascript', 'hey', 'javascript', 'hey', 'javascript', 'hey']
-        },
-        {
-          name: 's',
-          author: {
-            name: 'SheetJS',
-            imageURL: 'https://github.com/SheetJS.png?s=20'
-          },
-          version: '1.0.0',
-          license: 'Apache-2.0',
-          description: 'SheetJS Spreadsheet Helper Library'
-        },
-        {
-          name: 's-',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        },
-        {
-          name: 's-g',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        },
-        {
-          name: 's-f',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        },
-        {
-          name: 's-e',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        },
-        {
-          name: 's-d',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        },
-        {
-          name: 's-c',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        },
-        {
-          name: 's-b',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        },
-        {
-          name: 's-a',
-          author: {
-            name: 'teniryte',
-            imageURL: 'https://gravatar.com/avatar/1de9da4fd5405ac5f7d6a0f68e814220?s=20'
-          },
-          version: '0.0.1',
-          license: 'MIT',
-          description: null
-        }
-      ]
+      STATUSES
+    }
+  },
+  computed: {
+    ...mapGetters({
+      items: 'results',
+      queryString: 'queryString',
+      status: 'status',
+      currentPage: 'currentPage',
+      pages: 'pages'
+    })
+  },
+  methods: {
+    changeCurrentPage (page) {
+      this.$store.dispatch('changePage', page)
     }
   }
 }

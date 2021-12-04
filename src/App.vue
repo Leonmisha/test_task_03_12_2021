@@ -29,4 +29,10 @@ export default {
   flex-direction: column;
   min-height: 100vh;
 }
+a {
+  text-decoration: none;
+  &:hover {
+    color: rgb(51, 20, 224);
+  }
+}
 </style>
